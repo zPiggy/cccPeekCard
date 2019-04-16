@@ -1,0 +1,90 @@
+{
+  "version": "1.1.1",
+  "windows": {
+    "main": {
+      "main": true,
+      "url": "app://editor/index.html",
+      "windowType": "dockable",
+      "x": 0,
+      "y": 23,
+      "width": 2560,
+      "height": 1320,
+      "layout": {
+        "children": [
+          {
+            "children": [
+              {
+                "active": 0,
+                "children": [
+                  "hierarchy"
+                ],
+                "height": 586.15625,
+                "type": "panel",
+                "width": 294
+              },
+              {
+                "active": 0,
+                "children": [
+                  "assets"
+                ],
+                "height": 648.0625,
+                "type": "panel",
+                "width": 294
+              }
+            ],
+            "height": 1236.21875,
+            "type": "dock-v",
+            "width": 294
+          },
+          {
+            "active": 0,
+            "children": [
+              "inspector",
+              "cocos-services"
+            ],
+            "height": 1236.21875,
+            "type": "panel",
+            "width": 304
+          },
+          {
+            "children": [
+              {
+                "active": 0,
+                "children": [
+                  "scene"
+                ],
+                "height": 716.96875,
+                "type": "panel",
+                "width": 1957.984375
+              },
+              {
+                "active": 0,
+                "children": [
+                  "console",
+                  "timeline"
+                ],
+                "height": 517.25,
+                "type": "panel",
+                "width": 1957.984375
+              }
+            ],
+            "height": 1236.21875,
+            "type": "dock-v",
+            "width": 1957.984375
+          }
+        ],
+        "type": "dock-h"
+      },
+      "panels": [
+        "hierarchy",
+        "assets",
+        "inspector",
+        "cocos-services",
+        "console",
+        "timeline",
+        "scene"
+      ]
+    }
+  },
+  "panels": {}
+}
