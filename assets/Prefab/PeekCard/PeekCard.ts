@@ -1,33 +1,37 @@
+import BaseComponent from "../../Script/Base/BaseComponent";
+
 const { ccclass, property } = cc._decorator;
-/**
- * 搓牌类
- *
- * @export
- * @class PokerCard
- * @extends {cc.Node}
- * @example
- * var peekCardNode = new PeekCardNode();
- * parent.addChild(peekCardNode)
- * peekCardNode.setCardSize(cc.size(250, 330))
- * peekCardNode.setCardBack("Cards/Cards051");
- * peekCardNode.setCardFace("Cards/Cards000");
- * peekCardNode.setShadow("shadow");
- * peekCardNode.setFinger("HelloWorld", 1);
- * peekCardNode.setFinger("HelloWorld", 2);
- * 
- * peekCardNode.init();
- */
 @ccclass
-export default class PeekCardNode extends cc.Node {
-    mask: cc.Mask = undefined;      //总遮罩
-    cardBack: cc.Node = undefined;    //牌背
-    cardFace: cc.Node = undefined;    //牌面
-    shadowMask: cc.Mask = undefined;  //牌面遮罩
-    shadow: cc.Node = undefined;  //牌面阴影
+export default class PeekCard extends BaseComponent {
 
-    finger1: cc.Node = undefined;  //手指1
-    finger2: cc.Node = undefined;  //手指2
+    @property(cc.Mask)
+    mask: cc.Mask = undefined;
+    @property({
+        type: cc.Node,
+        tooltip: "mask/cardBack"
+    })
+    cardBack: cc.Node = undefined;
+    @property({
+        type: cc.Node,
+        tooltip: "mask/cardFace"
+    })
+    cardFace: cc.Node = undefined;
+    @property({
+        type: cc.Mask,
+        tooltip: "mask/cardFace/shadowMask"
+    })
+    shadowMask: cc.Mask = undefined;
+    @property({
+        type: cc.Node,
+        tooltip: "mask/cardFace/shadowMask/shadow"
+    })
+    shadow: cc.Node = undefined;
 
+    @property(cc.Node)
+    finger1: cc.Node = undefined;
+    @property(cc.Node)
+    finger2: cc.Node = undefined;
+    ////// 运行状态属性 ///////
     /**
      * 方向向量最小长度(滑动灵敏度) 值越大灵敏度越低
      * 在手机上手指较粗需要将滑动灵敏度降低 否则翻拍方向可能不是你预想的方向
@@ -52,44 +56,17 @@ export default class PeekCardNode extends cc.Node {
     _rotation: number = 0;
     _inFingers: number[] = [];
 
-
     _finishCallBack: Function = undefined;    //搓牌完成回调函数
 
-    constructor() {
-        super("PeekCardNode");
-        this.setContentSize(1280, 720)  //默认大小
-
-        this.mask = new cc.Node().addComponent(cc.Mask);
-        this.addChild(this.mask.node);
-        //添加牌背牌面
-        this.cardBack = new cc.Node().addComponent(cc.Sprite).node;
-        this.cardFace = new cc.Node().addComponent(cc.Sprite).node;
-        this.mask.node.addChild(this.cardBack)
-        this.mask.node.addChild(this.cardFace)
-        //添加阴影
-        this.shadowMask = new cc.Node().addComponent(cc.Mask);
-        this.shadowMask.type = cc.Mask.Type.IMAGE_STENCIL;        //遮罩类型设置为与牌面图相同
-        this.shadowMask.alphaThreshold = 0.1;
-        this.cardFace.addChild(this.shadowMask.node);
-
-        this.shadow = new cc.Node().addComponent(cc.Sprite).node;
-        this.shadow.parent = this.shadowMask.node;
-        this.shadow.setAnchorPoint(0, 0.5)
-
-        this.finger1 = new cc.Node().addComponent(cc.Sprite).node;
-        this.finger2 = new cc.Node().addComponent(cc.Sprite).node;
-        this.addChild(this.finger1)
-        this.addChild(this.finger2)
-
-        this.on(cc.Node.EventType.TOUCH_START, this._touchStart, this);
-        this.on(cc.Node.EventType.TOUCH_MOVE, this._touchMove, this);
-        this.on(cc.Node.EventType.TOUCH_END, this._touchEnd, this);
-
+    start() {
+        this.node.on(cc.Node.EventType.TOUCH_START, this._touchStart, this)
+        this.node.on(cc.Node.EventType.TOUCH_MOVE, this._touchMove, this)
+        this.node.on(cc.Node.EventType.TOUCH_END, this._touchEnd, this)
     }
     /**
-    * 设置搓牌完成回调
-    * @param {Function} callback 
-    */
+     * 设置搓牌完成回调
+     * @param {Function} callback 
+     */
     setFinishCallBack(callback: Function) {
         this._finishCallBack = callback;
     }
@@ -142,6 +119,9 @@ export default class PeekCardNode extends cc.Node {
 
         //规定 达到最小长度才确定方向
         let length = startToEndVec.mag();
+
+        cc.log("1", _tEndPos, _tPrePos, this._tStartPos, length);
+
         if (this._isMoveStart == false && length >= this._directionLength) {
             this._isMoveStart = true;
             this._tMoveVec = this._fixedDirection(startToEndVec);
@@ -251,7 +231,10 @@ export default class PeekCardNode extends cc.Node {
         this.init();
     }
 
-
+    setContentSize(w: number | cc.Size, h?: number) {
+        var size = this._getSize(w, h)
+        this.node.setContentSize(size);
+    }
     setCardSize(w: number | cc.Size, h?: number) {
         var size = this._getSize(w, h);
         this._cardSize = size;
@@ -271,7 +254,7 @@ export default class PeekCardNode extends cc.Node {
         this.shadowMask.alphaThreshold = 0.1;
     }
     async setCardFace(spf: string | cc.SpriteFrame) {
-        await this._setNodeSpriteFrame(this.cardFace, spf);
+        this._setNodeSpriteFrame(this.cardFace, spf);
 
     }
     /**
@@ -283,11 +266,10 @@ export default class PeekCardNode extends cc.Node {
      * @memberof PeekCard
      */
     async setShadow(spf: string | cc.SpriteFrame) {
-        await this._setNodeSpriteFrame(this.shadow, spf);
+        this._setNodeSpriteFrame(this.shadow, spf);
     }
     async setFinger(spf: string | cc.SpriteFrame, index: 1 | 2) {
-        await this._setNodeSpriteFrame(this["finger" + index], spf);
-        this["finger" + index].setContentSize(50, 80);
+        this._setNodeSpriteFrame(this["finger" + index], spf);
     }
 
     /**
@@ -525,5 +507,4 @@ export default class PeekCardNode extends cc.Node {
         node.getComponent(cc.Sprite).spriteFrame = spf;
         return spf;
     }
-
 }
