@@ -7,13 +7,21 @@ cocosCreator mask遮罩实现360°搓牌(咪牌)
 
 使用方法
 
+    //由于搓牌内部API改为同步 ，所以最好使用一个函数创建搓牌节点
+    async buildPeekCardNode() {
         var peekCardNode = new PeekCardNode();
-        parent.addChild(peekCardNode)
+        this.node.addChild(peekCardNode)
         peekCardNode.setCardSize(cc.size(250, 360))
-        peekCardNode.setCardBack("Cards/Cards051");
-        peekCardNode.setCardFace("Cards/Cards000");
-        peekCardNode.setShadow("shadow");//可以不适用阴影
-        peekCardNode.setFinger("HelloWorld", 1);//可以不使用手指
-        peekCardNode.setFinger("HelloWorld", 2);
+        await peekCardNode.setCardBack("Cards/Cards051");
+        await peekCardNode.setCardFace("Cards/Cards000");
+        await peekCardNode.setShadow("shadow");
+        //peekCardNode.width = 40;      //根据需求调整阴影宽度
+        await peekCardNode.setFinger("HelloWorld", 1);  //不设置手指则不显示
+        await peekCardNode.setFinger("HelloWorld", 2);
+        //以下三个属性根据实际需求进行调整
+        peekCardNode._directionLength = 20;     
+        peekCardNode._moveSpeed = 0.6;
+        peekCardNode.angleFixed = 15;
 
-        peekCardNode.init(); //触摸前必须调用
+        peekCardNode.init();    //搓牌前必须调用
+    }
