@@ -418,6 +418,7 @@ export default class PeekCardHorizontal extends cc.Node {
                 return moveDirection;
             }
         }
+
         return moveDirection;
     }
     /**

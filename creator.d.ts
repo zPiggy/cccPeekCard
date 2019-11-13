@@ -3910,28 +3910,29 @@ declare namespace cc {
 		插入一个 action 或者 tween 到队列中
 		@param other other 
 		*/
-		then(other: Action | Tween): void;
+		then(other: Action | Tween): Tween;
 		/**
 		!#en
 		Set tween target
 		!#zh
-		设置 tween 的 target 
+		设置 tween 的 target
+		@param target target 
 		*/
-		target(): void;
+		target(target: any): Tween;
 		/**
 		!#en
 		Start this tween
 		!#zh
 		运行当前 tween 
 		*/
-		start(): void;
+		start(): Tween;
 		/**
 		!#en
 		Stop this tween
 		!#zh
 		停止当前 tween 
 		*/
-		stop(): void;
+		stop(): Tween;
 		/**
 		!#en
 		Clone a tween
@@ -3939,7 +3940,7 @@ declare namespace cc {
 		克隆当前 tween
 		@param target target 
 		*/
-		clone(target?: any): void;
+		clone(target?: any): Tween;
 		/**
 		!#en
 		Add an action which calculate with absolute value
@@ -3949,7 +3950,7 @@ declare namespace cc {
 		@param props {scale: 2, position: cc.v3(100, 100, 100)}
 		@param opts opts 
 		*/
-		to(duration: number, props: any, opts: { progress: Function; easing: Function | string; }): void;
+		to(duration: number, props?: any, opts?: tweenOpts): Tween;
 		/**
 		!#en
 		Add an action which calculate with relative value
@@ -3959,7 +3960,15 @@ declare namespace cc {
 		@param props {scale: 2, position: cc.v3(100, 100, 100)}
 		@param opts opts 
 		*/
-		by(duration: number, props: any, opts: { progress: Function; easing: Function | string; }): void;
+		by(duration: number, props?: any, opts?: tweenOpts): Tween;
+		/**
+		!#en
+		Directly set target properties
+		!#zh
+		直接设置 target 的属性
+		@param props props 
+		*/
+		set(props: any): Tween;
 		/**
 		!#en
 		Add an delay action
@@ -3967,7 +3976,7 @@ declare namespace cc {
 		添加一个延时 action
 		@param duration duration 
 		*/
-		delay(duration: number): void;
+		delay(duration: number): Tween;
 		/**
 		!#en
 		Add an callback action
@@ -3975,28 +3984,28 @@ declare namespace cc {
 		添加一个回调 action
 		@param callback callback 
 		*/
-		call(callback: Function): void;
+		call(callback: Function): Tween;
 		/**
 		!#en
 		Add an hide action
 		!#zh
 		添加一个隐藏 action 
 		*/
-		hide(): void;
+		hide(): Tween;
 		/**
 		!#en
 		Add an show action
 		!#zh
 		添加一个显示 action 
 		*/
-		show(): void;
+		show(): Tween;
 		/**
 		!#en
 		Add an removeSelf action
 		!#zh
 		添加一个移除自己 action 
 		*/
-		removeSelf(): void;
+		removeSelf(): Tween;
 		/**
 		!#en
 		Add an sequence action
@@ -4004,37 +4013,71 @@ declare namespace cc {
 		添加一个队列 action
 		@param actions actions 
 		*/
-		sequence(actions: [Action]): void;
+		sequence(actions: [Action | Tween]): Tween;
+		/**
+		!#en
+		Add an parallel action
+		!#zh
+		添加一个并行 action
+		@param actions actions 
+		*/
+		parallel(actions: [Action | Tween]): Tween;
 		/**
 		!#en
 		Add an repeat action.
 		This action will integrate before actions to a sequence action as their parameters.
 		!#zh
-		添加一个重复 action，这个 action 会将之前的 action 整合成一个 sequence action 作为他的参数。
-		@param repeatTimes repeatTimes 
+		添加一个重复 action，这个 action 会将前一个动作作为他的参数。
+		@param repeatTimes repeatTimes
+		@param action action 
 		*/
-		repeat(repeatTimes: number): void;
+		repeat(repeatTimes: number, action?: Action | Tween): Tween;
 		/**
 		!#en
 		Add an repeat forever action
 		This action will integrate before actions to a sequence action as their parameters.
 		!#zh
-		添加一个永久重复 action，这个 action 会将之前的 action 整合成一个 sequence action 作为他的参数。 
+		添加一个永久重复 action，这个 action 会将前一个动作作为他的参数。
+		@param action action 
 		*/
-		repeatForever(): void;
+		repeatForever(action?: Action | Tween): Tween;
 		/**
 		!#en
 		Add an reverse time action.
 		This action will integrate before actions to a sequence action as their parameters.
 		!#zh
-		添加一个倒置时间 action，这个 action 会将之前的 action 整合成一个 sequence action 作为他的参数。 
+		添加一个倒置时间 action，这个 action 会将前一个动作作为他的参数。
+		@param action action 
 		*/
-		reverseTime(): void;
+		reverseTime(action?: Action | Tween): Tween;
 		/**
 		
 		@param target the target to animate 
 		*/
 		tween(target?: any): Tween;
+	}
+	/** 
+	 * 
+	 *导出 tween方法 
+	 * 
+	 * */
+	export function tween(target?: any): Tween;
+
+	type Ease = "linear" | "fade" |
+		"quadIn" | "quadOut" | "quadInOut" | "quadOutIn" |
+		"cubicIn" | "cubicOut" | "cubicInOut" | "cubicOutIn" |
+		"quartIn" | "quartOut" | "quartInOut" | "quartOutIn" |
+		"quintIn" | "quintOut" | "quintInOut" | "quintOutIn" |
+		"sineIn" | "sineOut" | "sineInOut" | "sineOutIn" |
+		"expoIn" | "expoOut" | "expoInOut" | "expoOutIn" |
+		"circIn" | "circOut" | "circInOut" | "circOutIn" |
+		"elasticIn" | "elasticOut" | "elasticInOut" | "elasticOutIn" |
+		"backIn" | "backOut" | "backInOut" | "backOutIn" |
+		"bounceIn" | "bounceOut" | "bounceInOut" | "bounceOutIn";
+
+	type tweenOpts = {
+		progress?: Function;
+		easing?: Function | Ease;
 	}
 	/** Class for particle asset handling. */
 	export class ParticleAsset extends Asset {
