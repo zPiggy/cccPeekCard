@@ -1,6 +1,6 @@
 
 export enum EMIDir {
-    Top = 0,
+    Top = 4,
     Bottom = 1,
     Left = 2,
     Right = 3,
@@ -31,7 +31,7 @@ export default class MiPai extends cc.Component {
 
     initPos_cardBack: cc.Vec2 = new cc.Vec2(0, 0);
     /**倒退回原始点 */
-    initPos_cardValue: cc.Vec2 = new cc.Vec2(0, 0);
+    // initPos_cardValue: cc.Vec2 = new cc.Vec2(0, 0);
     initPos_mask: cc.Vec2 = new cc.Vec2(0, 0);
 
     endPos_mask: cc.Vec2 = new cc.Vec2(0, 0);
@@ -53,10 +53,13 @@ export default class MiPai extends cc.Component {
      * 方向向量最小长度(滑动灵敏度) 值越大灵敏度越低
      * 在手机上手指较粗需要将滑动灵敏度降低 否则翻拍方向可能不是你预想的方向
      */
-    _directionLength: number = 5;
+    _directionLength: number = 15;//5;
 
     /**搓牌速度 */
     _cuo_speed: number = 0.5;
+
+    /**显示翻牌的回卷 */
+    _is_End_Show: boolean = false;
 
     start() {
         this.init();
@@ -85,7 +88,7 @@ export default class MiPai extends cc.Component {
 
         this.maskNode.opacity = 255;
 
-        this.initPos_cardValue = cc.Vec2.ZERO;
+        // this.initPos_cardValue = cc.Vec2.ZERO;
         this._initStatus();
     }
 
@@ -93,6 +96,8 @@ export default class MiPai extends cc.Component {
         this._isOpenCard = false; //改变状态 未开牌
         this._isMoveStart = false;
         this._isHorizontal = true;
+        this._is_End_Show = false;
+
     }
 
     resetInit() {
@@ -136,6 +141,7 @@ export default class MiPai extends cc.Component {
 
         //设定初始位置和横竖轴而已
         if (!this._isMoveStart && length >= this._directionLength) {
+            this._is_End_Show = false;
 
             this._isMoveStart = true;
 
@@ -151,19 +157,17 @@ export default class MiPai extends cc.Component {
                     //向左函数
                     cc.log('left');
                     //倒退回原始点的位置赋值
-                    this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, this.cardBackNode.height);
+                    // this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, this.cardBackNode.height);
                     //设置牌初始位置
                     this.cardValueNode.setPosition(-this.cardBackNode.width, this.cardBackNode.y);
 
-                    // this.endPos_mask = new cc.Vec2(this.cardBackNode.x, this.cardBackNode.height);
                     this._miDir = EMIDir.Left;
                 } else {
                     //向右函数
                     cc.log('right');
-                    this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, -this.cardBackNode.height);
+                    // this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, -this.cardBackNode.height);
                     this.cardValueNode.setPosition(this.cardBackNode.width, this.cardBackNode.y);
 
-                    // this.endPos_mask = cc.v2(this.cardBackNode.width, this.cardBackNode.y);
 
                     this._miDir = EMIDir.Right;
                 }
@@ -175,17 +179,15 @@ export default class MiPai extends cc.Component {
                 if (endY > 0) {
                     //向下函数
                     cc.log('down');
-                    this.initPos_cardValue = new cc.Vec2(-this.cardBackNode.width, this.cardBackNode.y);
+                    // this.initPos_cardValue = new cc.Vec2(-this.cardBackNode.width, this.cardBackNode.y);
                     this.cardValueNode.setPosition(this.cardBackNode.x, this.cardBackNode.height);
-                    // this.endPos_mask = cc.v2(this.cardBackNode.x, this.cardBackNode.height);
                     this._miDir = EMIDir.Bottom;
 
                 } else {
                     //向上函数
                     cc.log('up');
-                    this.initPos_cardValue = new cc.Vec2(this.cardBackNode.width, this.cardBackNode.y);
+                    // this.initPos_cardValue = new cc.Vec2(this.cardBackNode.width, this.cardBackNode.y);
                     this.cardValueNode.setPosition(this.cardBackNode.x, -this.cardBackNode.height);
-                    // this.endPos_mask = cc.v2(this.cardBackNode.x, -this.cardBackNode.height);
                     this._miDir = EMIDir.Top;
 
                 }
@@ -195,6 +197,7 @@ export default class MiPai extends cc.Component {
 
         }
         else if (this._isMoveStart) {//移动
+            this._is_End_Show = true;
 
             let endX = this._tStartPos.x - _tEndPos.x;
             let endY = this._tStartPos.y - _tEndPos.y;
@@ -221,7 +224,7 @@ export default class MiPai extends cc.Component {
                     this._moveByVec2(this.maskNode, unitV, this._cuo_speed);
                     this._moveByVec2(this.cardBackNode, _unitV, this._cuo_speed);
 
-                    this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, this.cardBackNode.height);
+                    // this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, this.cardBackNode.height);
 
                     this._miDir = EMIDir.Left;
 
@@ -236,7 +239,7 @@ export default class MiPai extends cc.Component {
                     this._moveByVec2(this.maskNode, unitV, this._cuo_speed);
                     this._moveByVec2(this.cardBackNode, _unitV, this._cuo_speed);
 
-                    this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, -this.cardBackNode.height);
+                    // this.initPos_cardValue = new cc.Vec2(this.cardBackNode.x, -this.cardBackNode.height);
                     this._miDir = EMIDir.Right;
 
                 }
@@ -257,7 +260,7 @@ export default class MiPai extends cc.Component {
                     this._moveByVec2(this.maskNode, unitV, this._cuo_speed);
                     this._moveByVec2(this.cardBackNode, _unitV, this._cuo_speed);
 
-                    this.initPos_cardValue = new cc.Vec2(-this.cardBackNode.width, this.cardBackNode.y);
+                    // this.initPos_cardValue = new cc.Vec2(-this.cardBackNode.width, this.cardBackNode.y);
                     this._miDir = EMIDir.Bottom;
 
                 } else {
@@ -268,7 +271,7 @@ export default class MiPai extends cc.Component {
                     this._moveByVec2(this.maskNode, unitV, this._cuo_speed);
                     this._moveByVec2(this.cardBackNode, _unitV, this._cuo_speed);
 
-                    this.initPos_cardValue = new cc.Vec2(this.cardBackNode.width, this.cardBackNode.y);
+                    // this.initPos_cardValue = new cc.Vec2(this.cardBackNode.width, this.cardBackNode.y);
                     this._miDir = EMIDir.Top;
 
                 }
@@ -286,23 +289,51 @@ export default class MiPai extends cc.Component {
             return;
         }
         if (event.getID() != 0) return;//禁止多点触碰
+        if (!this._is_End_Show) { return; }
+
+        // if (!this._isMoveStart) { return; }
+
+
+
+
+        let initPos_cardValue = cc.Vec2.ZERO;
+        if (this._miDir) {
+            switch (this._miDir) {
+                case EMIDir.Top:
+                    initPos_cardValue = cc.v2(this.cardBackNode.width, this.cardBackNode.y);
+                    break;
+                case EMIDir.Bottom:
+                    initPos_cardValue = cc.v2(-this.cardBackNode.width, this.cardBackNode.y);
+                    break;
+                case EMIDir.Left:
+                    initPos_cardValue = cc.v2(this.cardBackNode.x, this.cardBackNode.height)
+                    break;
+                case EMIDir.Right:
+                    initPos_cardValue = cc.v2(this.cardBackNode.x, -this.cardBackNode.height);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         let offest_time = 0.4;
         let openEndFunc = cc.moveTo(offest_time, this.initPos_cardBack);
         this.cardBackNode.stopAllActions();
         this.cardBackNode.runAction(openEndFunc);
 
-
-        if (this.initPos_cardValue) {
-            cc.log('this.initPos_cardValue:' + this.initPos_cardValue);
-            let openEndFunc_value = cc.sequence(
-                cc.moveTo(offest_time, this.initPos_cardValue),
-                cc.callFunc(() => {
-                    this.init();
-                }, this)
-            );
-            this.cardValueNode.stopAllActions();
-            this.cardValueNode.runAction(openEndFunc_value);
-        }
+        // if (this.initPos_cardValue) {
+        // cc.log('this.initPos_cardValue:' + this.initPos_cardValue);
+        let openEndFunc_value = cc.sequence(
+            cc.moveTo(offest_time, initPos_cardValue),
+            cc.callFunc(() => {
+                console.log("touch end callback");
+                this.init();
+            }, this)
+        );
+        this.cardValueNode.stopAllActions();
+        this.cardValueNode.runAction(openEndFunc_value);
+        // }
 
         let openEndFunc_mask = cc.moveTo(offest_time, this.initPos_mask);
 
