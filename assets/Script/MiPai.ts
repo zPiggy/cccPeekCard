@@ -60,12 +60,17 @@ export default class MiPai extends cc.Component {
 
     /**显示翻牌的回卷 */
     _is_End_Show: boolean = false;
+    /**第一次触摸的 */
+    _touchID: number = 0;
+    // isFirstTouch: boolean = true;
 
     start() {
         this.init();
         this.node.on(cc.Node.EventType.TOUCH_START, this._touchStart, this);
         this.node.on(cc.Node.EventType.TOUCH_MOVE, this._touchMove, this);
         this.node.on(cc.Node.EventType.TOUCH_END, this._touchEnd, this);
+
+        console.log("start")
     }
 
     init() {
@@ -108,7 +113,29 @@ export default class MiPai extends cc.Component {
         if (this._isOpenCard) {
             return;
         }
-        if (event.getID() != 0) return;//禁止多点触碰
+        console.log(event.getID() + ":::::::_touchStart event.getID()");
+        if (event.getID() < 0) {//是iphone上大部分的浏览器的touch id通常是负的 (safari,uc)
+
+            // if (this.isFirstTouch) {
+            this._touchID = event.getID();
+            // this.isFirstTouch = false;
+            // }
+            // else {
+            //     if (this._touchID != event.getID()) return;//禁止多点触碰
+            // }
+
+        }
+        else if (event.getID() >= 0) {
+            if (event.getID() > 1024) {//iphone 上的qq浏览器 touch id 是正的大数(例:1061335809)
+                this._touchID = event.getID();
+            } else {
+                if (event.getID() != 0) return;//禁止多点触碰
+            }
+
+        }
+        else {//undefined 或 null
+            console.log(event.getID() + ":::::touchStart event.getID() undefined");
+        }
 
         this._tStartPos = event.getLocation();//获得滑动初始点
 
@@ -123,7 +150,20 @@ export default class MiPai extends cc.Component {
         if (this._isOpenCard || !this._tStartPos) {
             return;
         }
-        if (event.getID() != 0) return;//禁止多点触碰
+        console.log(event.getID() + ":::::::_touchMove event.getID()");
+        if (event.getID() < 0) {//是iphone上的touch id通常是负的
+            if (this._touchID != event.getID()) return;//禁止多点触碰
+        }
+        else if (event.getID() >= 0) {
+            if (event.getID() > 1024) {//iphone 上的qq浏览器 touch id 是正的大数(例:1061335809)
+                if (this._touchID != event.getID()) return;//禁止多点触碰
+            } else {
+                if (event.getID() != 0) return;//禁止多点触碰
+            }
+        }
+        else {//undefined 或 null
+            console.log(event.getID() + ":::::_touchMove event.getID() undefined");
+        }
 
         let _tEndPos = event.getLocation();
         let _tPrePos = event.getPreviousLocation();
@@ -288,7 +328,23 @@ export default class MiPai extends cc.Component {
         if (this._isOpenCard || !this._tStartPos) {
             return;
         }
-        if (event.getID() != 0) return;//禁止多点触碰
+        console.log(event.getID() + ":::::::_touchEnd event.getID()");
+
+        if (event.getID() < 0) {//是iphone上的touch id通常是负的
+
+            if (this._touchID != event.getID()) return;//禁止多点触碰
+        }
+        else if (event.getID() >= 0) {
+            if (event.getID() > 1024) {//iphone 上的qq浏览器 touch id 是正的大数(例:1061335809)
+                if (this._touchID != event.getID()) return;//禁止多点触碰
+            } else {
+                if (event.getID() != 0) return;//禁止多点触碰
+            }
+        }
+        else {//undefined 或 null
+            console.log(event.getID() + ":::::_touchEnd event.getID() undefined");
+        }
+
         if (!this._is_End_Show) { return; }
 
         // if (!this._isMoveStart) { return; }
@@ -328,6 +384,8 @@ export default class MiPai extends cc.Component {
             cc.moveTo(offest_time, initPos_cardValue),
             cc.callFunc(() => {
                 console.log("touch end callback");
+                // this.isFirstTouch = true;
+                this._touchID = 0;
                 this.init();
             }, this)
         );
