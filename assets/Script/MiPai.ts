@@ -84,7 +84,8 @@ export default class MiPai extends cc.Component {
 
         this.trueCardNode.active = false;
         this.trueCardNode.opacity = 255;
-        this.trueCardNode.setRotation(90);
+        // this.trueCardNode.setRotation(90);
+        this.trueCardNode.setRotation(0);
 
         this.cardBackNode.setPosition(cc.Vec2.ZERO);
         this.cardValueNode.setPosition(cc.Vec2.ZERO);
@@ -406,7 +407,7 @@ export default class MiPai extends cc.Component {
     _canOpen() {
         let localPos = this.maskNode.getPosition();
         var length = localPos.mag();//遮罩初始坐标是(0, 0) 此处坐标即向量
-        var maxLength = this.maskNode.height;
+        var maxLength = this.maskNode.height; //.height;// .height;
         if (!this._isHorizontal) {//因为mask旋转了90度，所以加非
             maxLength = this.maskNode.width;
         }
@@ -504,7 +505,7 @@ export default class MiPai extends cc.Component {
                 cc.tween(this.cardValueNode).to(offset_time, { x: 0, y: 0 })
                     .call(() => {
                         self.trueCardNode.active = true;
-                        self.trueCardNode.setRotation(270);
+                        self.trueCardNode.setRotation(180);
                         self.cardBackNode.active = false;
 
                         let openEndFunc_mask = cc.fadeTo(fade_offset_time, 0);
@@ -531,7 +532,7 @@ export default class MiPai extends cc.Component {
                 cc.tween(this.cardValueNode).to(offset_time, { x: 0, y: 0 }).call(() => {
 
                     self.trueCardNode.active = true;
-                    self.trueCardNode.setRotation(270);
+                    self.trueCardNode.setRotation(180);
                     self.cardBackNode.active = false;
 
                     let openEndFunc_mask = cc.fadeTo(fade_offset_time, 0);
