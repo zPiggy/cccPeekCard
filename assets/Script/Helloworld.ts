@@ -1,12 +1,4 @@
-import PeekCardNode from "./PeekCardNode";
-import PeekCard from "../Prefab/PeekCard/PeekCard";
-import PeekCardHorizontal from "./PeekCardHorizontal";
-
-
-export enum DirType {
-    horizontal = 0,
-    vertical = 1
-}
+import PeekCard from "./PeekCard";
 
 const { ccclass, property } = cc._decorator;
 
@@ -16,71 +8,67 @@ export default class Helloworld extends cc.Component {
     @property(PeekCard)
     peekCard: PeekCard = undefined;
 
-    @property({ type: cc.Enum(DirType), visible: false })
-    private _type: DirType = DirType.vertical;
 
-    @property({ type: cc.Enum(DirType) })//暴露到编辑器上的选项 可选方向
-    get dirType() { return this._type; }
-    set dirType(type) {
-        this._type = type;
-    }
+    async start() {
 
-    start() {
 
-        cc.log(this._type);
-        if (this._type == DirType.horizontal) {
-            this.buildPeekCardNodeHoz();
+        if (false) {
+            window["peekCard"] = this.peekCard;
+
+            ////// 拖动 PeekCard 脚本到场景中 执行组件的 reset 操作即可自动创建好所有节点
+            console.log("预先做好的搓牌节点 ", PeekCard.DirType[this.peekCard.dirType]);
+
+            this.peekCard.node.active = true;
+
+            // 设置搓牌区域大小 默认是Canvas设计分辨率大小
+            this.peekCard.setTouchAreaSize(cc.size(1280, 720))
+
+            this.peekCard.setCardSize(cc.size(90 * 3, 130 * 3))
+            await this.peekCard.setCardBack("Cards/Cards051");
+            await this.peekCard.setCardFace("Cards/Cards000");
+            await this.peekCard.setShadow("shadow");
+            await this.peekCard.setFinger(null);
+            this.peekCard.directionLength = 20;
+            this.peekCard.moveSpeed = 0.6;
+            this.peekCard.angleFixed = 5;
+
+            this.peekCard.init();
         }
         else {
-            this.buildPeekCardNode();
+            this.peekCard.node.active = false;
+            this.buildPeekCard(PeekCard.DirType.horizontal);
         }
 
-
-
-        /////////////////
-        // this.peekCard.setCardSize(cc.size(270, 390))
-        // this.peekCard.setCardBack("Cards/Cards051");
-        // this.peekCard.setCardFace("Cards/Cards000");
-        // this.peekCard.setShadow("shadow");
-        // this.peekCard.setFinger("HelloWorld", 1);
-        // this.peekCard.setFinger("HelloWorld", 2);
-        // this.peekCard.init();
     }
-    async buildPeekCardNode() {
-        var peekCardNode = new PeekCardNode();
-        this.node.addChild(peekCardNode)
-        peekCardNode.setCardSize(cc.size(250, 360))
-        await peekCardNode.setCardBack("Cards/Cards051");
-        await peekCardNode.setCardFace("Cards/Cards000");
-        await peekCardNode.setShadow("shadow");
-        await peekCardNode.setFinger("HelloWorld", 1);
-        await peekCardNode.setFinger("HelloWorld", 2);
-        peekCardNode._directionLength = 20;
-        peekCardNode._moveSpeed = 0.6;
-        peekCardNode.angleFixed = 15;
 
-        peekCardNode.init();
-    }
-    /**在原版基础上修改的牌处于横轴方向 */
-    async buildPeekCardNodeHoz() {
-        var peekCardNode = new PeekCardHorizontal();
-        this.node.addChild(peekCardNode)
+    async buildPeekCard(dirType: PeekCard["dirType"]) {
+        console.log("动态创建搓牌节点 ", PeekCard.DirType[dirType]);
+        var peekCard = new cc.Node("PeekCard").addComponent(PeekCard);
+        window["peekCard"] = peekCard;
 
-        peekCardNode.setCardSize(cc.size(360, 250));
-        await peekCardNode.setCardBack("Cards/Cards051");
-        await peekCardNode.setCardFace("Cards/Cards000");
-        await peekCardNode.setShadow("shadow");
-        await peekCardNode.setFinger("HelloWorld", 1);
-        await peekCardNode.setFinger("HelloWorld", 2);
-        peekCardNode._directionLength = 20;
-        peekCardNode._moveSpeed = 0.6;
-        peekCardNode.angleFixed = 15;
+        this.node.addChild(peekCard.node);
+        // 动态创建时一定要第一时间设置好原始方向
+        peekCard._originalDir = peekCard._dirType = PeekCard.DirType.vertical;
+        // 设置搓牌区域大小 默认是Canvas设计分辨率大小
+        this.peekCard.setTouchAreaSize(cc.size(1280, 720))
+        // 优先设置牌大小
+        peekCard.setCardSize(cc.size(90 * 3 - 20, 130 * 3 - 30));
 
-        peekCardNode.init();
+        // 动态设置搓牌方向(允许在其他位置调用)
+        peekCard.dirType = dirType;
 
-        peekCardNode.setFinishCallBack(() => {
-            cc.log("搓牌完成。。。。。")
-        })
+        await peekCard.setCardBack("Cards/Cards051");
+        await peekCard.setCardFace("Cards/Cards000");
+        await peekCard.setShadow("shadow");
+        await peekCard.setFinger("HelloWorld", cc.size(40, 80));
+
+        peekCard.directionLength = 20;
+        peekCard.moveSpeed = 0.6;
+        peekCard.angleFixed = 5;
+
+        peekCard.init();
+
+
     }
 
 }
